@@ -1,0 +1,771 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNZlO2pR+2FIel5cIO61fS/",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/student-abdulrehman/SMIT-Coding-Night/blob/main/coding%20night\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import sys\n",
+        "import importlib\n",
+        "\n",
+        "# Remove existing modules from sys.modules to force a fresh import\n",
+        "# This is a common workaround in notebooks when files are modified on disk\n",
+        "for module_name in ['services.storage_service', 'services.student_manager', 'models.student',\n",
+        "                    'ui.add_student', 'ui.update_student', 'ui.delete_student',\n",
+        "                    'ui.list_students', 'ui.search_students', 'ui.fees_attendance']:\n",
+        "    if module_name in sys.modules:\n",
+        "        del sys.modules[module_name]\n",
+        "\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import streamlit as st\n",
+        "from services.storage_service import StorageService\n",
+        "from services.student_manager import StudentManager\n",
+        "\n",
+        "from ui.add_student import show_add_student\n",
+        "from ui.update_student import show_update_student\n",
+        "from ui.delete_student import show_delete_student\n",
+        "from ui.list_students import show_list_students\n",
+        "from ui.search_students import show_search_students\n",
+        "from ui.fees_attendance import show_fees_and_attendance\n",
+        "\n",
+        "def main():\n",
+        "    st.title(\"🎓 Student Management System\")\n",
+        "\n",
+        "    storage = StorageService()\n",
+        "    manager = StudentManager(storage)\n",
+        "\n",
+        "    menu = [\"Add Student\", \"Update Student\", \"Delete Student\", \"List Students\", \"Search\", \"Fees + Attendance\"]\n",
+        "    choice = st.sidebar.selectbox(\"Menu\", menu)\n",
+        "\n",
+        "    if choice == \"Add Student\":\n",
+        "        show_add_student(manager)\n",
+        "    elif choice == \"Update Student\":\n",
+        "        show_update_student(manager)\n",
+        "    elif choice == \"Delete Student\":\n",
+        "        show_delete_student(manager)\n",
+        "    elif choice == \"List Students\":\n",
+        "        show_list_students(manager)\n",
+        "    elif choice == \"Search\":\n",
+        "        show_search_students(manager)\n",
+        "    elif choice == \"Fees + Attendance\":\n",
+        "        show_fees_and_attendance(manager)\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    main()\n",
+        "\"Fees + Attendance\""
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 261
+        },
+        "id": "dVTX5tt5GiKc",
+        "outputId": "5f38125a-4459-4dea-f7a0-94f48cfe0c31"
+      },
+      "execution_count": 51,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "2026-01-04 08:16:33.821 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.822 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.823 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.825 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.826 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.827 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.827 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.828 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.829 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.830 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.831 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.833 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+            "2026-01-04 08:16:33.834 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'Fees + Attendance'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 51
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "root",
+        "outputId": "646dc94e-bf42-432a-dc00-b0482b59cc22"
+      },
+      "source": [
+        "!mkdir -p services models ui\n",
+        "!touch services/__init__.py models/__init__.py ui/__init__.py\n",
+        "\n",
+        "file_contents = {\n",
+        "    \"services/storage_service.py\": \"\"\"\n",
+        "import pandas as pd\n",
+        "import json\n",
+        "import os\n",
+        "\n",
+        "class StorageService:\n",
+        "    def __init__(self, file_path='students.json'):\n",
+        "        self.file_path = file_path\n",
+        "        self._ensure_file_exists()\n",
+        "\n",
+        "    def _ensure_file_exists(self):\n",
+        "        if not os.path.exists(self.file_path):\n",
+        "            with open(self.file_path, 'w') as f:\n",
+        "                json.dump([], f)\n",
+        "\n",
+        "    def load_data(self):\n",
+        "        with open(self.file_path, 'r') as f:\n",
+        "            data = json.load(f)\n",
+        "        return data\n",
+        "\n",
+        "    def save_data(self, data):\n",
+        "        with open(self.file_path, 'w') as f:\n",
+        "            json.dump(data, f, indent=4)\n",
+        "\"\"\",\n",
+        "    \"services/student_manager.py\": \"\"\"\n",
+        "from models.student import Student\n",
+        "from services.storage_service import StorageService\n",
+        "\n",
+        "class StudentManager:\n",
+        "    def __init__(self, storage_service: StorageService):\n",
+        "        self.storage = storage_service\n",
+        "        self.students = self._load_students()\n",
+        "\n",
+        "    def _load_students(self):\n",
+        "        data = self.storage.load_data()\n",
+        "        return {s['id']: Student.from_dict(s) for s in data}\n",
+        "\n",
+        "    def _save_students(self):\n",
+        "        data = [s.to_dict() for s in self.students.values()]\n",
+        "        self.storage.save_data(data)\n",
+        "\n",
+        "    def add_student(self, student: Student):\n",
+        "        if student.id in self.students:\n",
+        "            return False\n",
+        "        self.students[student.id] = student\n",
+        "        self._save_students()\n",
+        "        return True\n",
+        "\n",
+        "    def update_student(self, student_id, **kwargs):\n",
+        "        student = self.students.get(student_id)\n",
+        "        if not student:\n",
+        "            return False\n",
+        "        for key, value in kwargs.items():\n",
+        "            if hasattr(student, key):\n",
+        "                setattr(student, key, value)\n",
+        "        self._save_students()\n",
+        "        return True\n",
+        "\n",
+        "    def delete_student(self, student_id):\n",
+        "        if student_id in self.students:\n",
+        "            del self.students[student_id]\n",
+        "            self._save_students()\n",
+        "            return True\n",
+        "        return False\n",
+        "\n",
+        "    def get_student(self, student_id):\n",
+        "        return self.students.get(student_id)\n",
+        "\n",
+        "    def list_students(self):\n",
+        "        return list(self.students.values())\n",
+        "\n",
+        "    def search(self, **kwargs):\n",
+        "        results = []\n",
+        "        for student in self.students.values():\n",
+        "            match = True\n",
+        "            for key, value in kwargs.items():\n",
+        "                if hasattr(student, key) and str(getattr(student, key)).lower().find(str(value).lower()) == -1:\n",
+        "                    match = False\n",
+        "                    break\n",
+        "            if match:\n",
+        "                results.append(student)\n",
+        "        return results\n",
+        "\n",
+        "    def add_payment(self, student_id, amount, method, date):\n",
+        "        student = self.students.get(student_id)\n",
+        "        if student:\n",
+        "            student.amount_paid += amount\n",
+        "            student.payments.append({'amount': amount, 'method': method, 'date': date})\n",
+        "            self._save_students()\n",
+        "            return True\n",
+        "        return False\n",
+        "\n",
+        "    def mark_attendance(self, student_id, month_year, day, status):\n",
+        "        student = self.students.get(student_id)\n",
+        "        if student:\n",
+        "            if month_year not in student.attendance:\n",
+        "                student.attendance[month_year] = {}\n",
+        "            student.attendance[month_year][str(day)] = status\n",
+        "            self._save_students()\n",
+        "            return True\n",
+        "        return False\n",
+        "\n",
+        "    def get_month_attendance(self, student_id, month_year):\n",
+        "        student = self.students.get(student_id)\n",
+        "        if student and month_year in student.attendance:\n",
+        "            return student.attendance[month_year]\n",
+        "        return {}\n",
+        "\"\"\",\n",
+        "    \"models/student.py\": \"\"\"\n",
+        "import uuid\n",
+        "\n",
+        "class Student:\n",
+        "    def __init__(self, student_id, name, age, grade, performance, total_fee=5000, amount_paid=0, payments=None, attendance=None):\n",
+        "        self.id = student_id\n",
+        "        self.name = name\n",
+        "        self.age = age\n",
+        "        self.grade = grade\n",
+        "        self.performance = performance\n",
+        "        self.total_fee = total_fee\n",
+        "        self.amount_paid = amount_paid\n",
+        "        self.payments = payments if payments is not None else []\n",
+        "        self.attendance = attendance if attendance is not None else {}\n",
+        "\n",
+        "    @classmethod\n",
+        "    def create(cls, name, age, grade, performance, total_fee=5000, amount_paid=0):\n",
+        "        student_id = str(uuid.uuid4())\n",
+        "        return cls(student_id, name, age, grade, performance, total_fee, amount_paid)\n",
+        "\n",
+        "    @classmethod\n",
+        "    def from_dict(cls, data):\n",
+        "        return cls(\n",
+        "            data['id'],\n",
+        "            data['name'],\n",
+        "            data['age'],\n",
+        "            data['grade'],\n",
+        "            data['performance'],\n",
+        "            data.get('total_fee', 5000),\n",
+        "            data.get('amount_paid', 0),\n",
+        "            data.get('payments', []),\n",
+        "            data.get('attendance', {})\n",
+        "        )\n",
+        "\n",
+        "    def to_dict(self):\n",
+        "        return {\n",
+        "            'id': self.id,\n",
+        "            'name': self.name,\n",
+        "            'age': self.age,\n",
+        "            'grade': self.grade,\n",
+        "            'performance': self.performance,\n",
+        "            'total_fee': self.total_fee,\n",
+        "            'amount_paid': self.amount_paid,\n",
+        "            'payments': self.payments,\n",
+        "            'attendance': self.attendance\n",
+        "        }\n",
+        "\n",
+        "    def __repr__(self):\n",
+        "        return f\"Student(ID: {self.id[:4]}, Name: {self.name}, Grade: {self.grade})\"\n",
+        "\"\"\",\n",
+        "    \"ui/add_student.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_add_student(manager):\n",
+        "    st.write(\"Add Student UI (Placeholder)\")\n",
+        "\"\"\",\n",
+        "    \"ui/update_student.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_update_student(manager):\n",
+        "    st.write(\"Update Student UI (Placeholder)\")\n",
+        "\"\"\",\n",
+        "    \"ui/delete_student.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_delete_student(manager):\n",
+        "    st.write(\"Delete Student UI (Placeholder)\")\n",
+        "\"\"\",\n",
+        "    \"ui/list_students.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_list_students(manager):\n",
+        "    st.write(\"List Students UI (Placeholder)\")\n",
+        "\"\"\",\n",
+        "    \"ui/search_students.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_search_students(manager):\n",
+        "    st.write(\"Search Students UI (Placeholder)\")\n",
+        "\"\"\",\n",
+        "    \"ui/fees_attendance.py\": \"\"\"\n",
+        "import streamlit as st\n",
+        "def show_fees_and_attendance(manager):\n",
+        "    st.write(\"Fees and Attendance UI (Placeholder)\")\n",
+        "\"\"\"\n",
+        "}\n",
+        "\n",
+        "for file_path, content in file_contents.items():\n",
+        "    with open(file_path, \"w\") as f:\n",
+        "        f.write(content.strip())\n",
+        "print(\"All files written successfully.\")"
+      ],
+      "execution_count": 52,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "All files written successfully.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 53,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XI3NnzyQFqyg",
+        "outputId": "ec647b00-81bd-405b-ede7-4b37a80ef244"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Initial count: 0\n",
+            "After add: 1\n",
+            "Update ok: True now grade: A\n",
+            "Payment ok: True amount_paid: 500\n",
+            "Mark attendance ok: True attendance: {'23': 'P'}\n",
+            "Search results: 1\n",
+            "Delete ok: True final count: 0\n"
+          ]
+        }
+      ],
+      "source": [
+        "from services.storage_service import StorageService\n",
+        "from services.student_manager import StudentManager\n",
+        "from models.student import Student\n",
+        "\n",
+        "s = StorageService()\n",
+        "manager = StudentManager(s)\n",
+        "print('Initial count:', len(manager.list_students()))\n",
+        "\n",
+        "# Add a student\n",
+        "st = Student.create('Automated Test', 12, 'B', 88.5, total_fee=3000)\n",
+        "manager.add_student(st)\n",
+        "print('After add:', len(manager.list_students()))\n",
+        "\n",
+        "# Update student\n",
+        "ok = manager.update_student(st.id, grade='A', performance=90)\n",
+        "print('Update ok:', ok, 'now grade:', manager.get_student(st.id).grade)\n",
+        "\n",
+        "# Add payment\n",
+        "okp = manager.add_payment(st.id, 500, 'Cash', '2025-11-23')\n",
+        "print('Payment ok:', okp, 'amount_paid:', manager.get_student(st.id).amount_paid)\n",
+        "\n",
+        "# Mark attendance\n",
+        "oka = manager.mark_attendance(st.id, '2025-11', 23, 'P')\n",
+        "print('Mark attendance ok:', oka, 'attendance:', manager.get_month_attendance(st.id, '2025-11'))\n",
+        "\n",
+        "# Search\n",
+        "res = manager.search(name='Automated')\n",
+        "print('Search results:', len(res))\n",
+        "\n",
+        "# Delete\n",
+        "delok = manager.delete_student(st.id)\n",
+        "print('Delete ok:', delok, 'final count:', len(manager.list_students()))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from models.student import Student\n",
+        "s = Student.create('Test Student', 15, 'A', 85)\n",
+        "print('OK', s.total_fee, s.id)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Nln1CMY7GZki",
+        "outputId": "6aa17ab6-28b1-49ac-ea5e-f49d738465f1"
+      },
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "OK 5000 7b744af1-b00a-4c86-95f1-0263338eaff3\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#AI Mode Code SMIT CDGNGT P1\n",
+        "\n",
+        "```\n",
+        "# This is formatted as code\n",
+        "```\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "O-VDB137EwDV"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "student_system/\n",
+        "├── data/\n",
+        "│   └── students.json      # JSON file for data storage\n",
+        "├── models/\n",
+        "│   └── student.py         # The Student data class\n",
+        "├── services/\n",
+        "│   └── manager.py         # Business logic (CRUD operations)\n",
+        "├── ui/\n",
+        "│   └── dashboard.py       # Streamlit UI components\n",
+        "└── main.py                # The application entry point\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 106
+        },
+        "id": "AIUeU6IBFQJJ",
+        "outputId": "a5afeeeb-f47c-45e0-cb4f-513ed66913c6"
+      },
+      "execution_count": 56,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "SyntaxError",
+          "evalue": "invalid character '├' (U+251C) (ipython-input-3595198918.py, line 2)",
+          "traceback": [
+            "\u001b[0;36m  File \u001b[0;32m\"/tmp/ipython-input-3595198918.py\"\u001b[0;36m, line \u001b[0;32m2\u001b[0m\n\u001b[0;31m    ├── data/\u001b[0m\n\u001b[0m    ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m invalid character '├' (U+251C)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "class Student:\n",
+        "    def __init__(self, student_id, name, age, grade, gpa):\n",
+        "        self.student_id = str(student_id)\n",
+        "        self.name = name\n",
+        "        self.age = int(age)\n",
+        "        self.grade = grade\n",
+        "        self.gpa = float(gpa)\n",
+        "\n",
+        "    def to_dict(self):\n",
+        "        \"\"\"Converts object to dictionary for JSON storage.\"\"\"\n",
+        "        return vars(self)\n"
+      ],
+      "metadata": {
+        "id": "7kOonQbvFMVD"
+      },
+      "execution_count": 57,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import json\n",
+        "import os\n",
+        "from models.student import Student\n",
+        "\n",
+        "class StudentManager:\n",
+        "    def __init__(self, file_path='data/students.json'):\n",
+        "        self.file_path = file_path\n",
+        "        self.students = self._load_data()\n",
+        "\n",
+        "    def _load_data(self):\n",
+        "        if os.path.exists(self.file_path):\n",
+        "            with open(self.file_path, 'r') as f:\n",
+        "                try:\n",
+        "                    return [Student(**data) for data in json.load(f)]\n",
+        "                except json.JSONDecodeError:\n",
+        "                    return []\n",
+        "        return []\n",
+        "\n",
+        "    def _save_data(self):\n",
+        "        with open(self.file_path, 'w') as f:\n",
+        "            json.dump([s.to_dict() for s in self.students], f, indent=4)\n",
+        "\n",
+        "    def add_student(self, student):\n",
+        "        if any(s.student_id == student.student_id for s in self.students):\n",
+        "            return False, \"Error: Student ID already exists.\"\n",
+        "        self.students.append(student)\n",
+        "        self._save_data()\n",
+        "        return True, \"Student added successfully!\"\n",
+        "\n",
+        "    def delete_student(self, student_id):\n",
+        "        self.students = [s for s in self.students if s.student_id != student_id]\n",
+        "        self._save_data()\n",
+        "        return True\n",
+        "\n",
+        "    def update_student(self, student_id, updated_data):\n",
+        "        for s in self.students:\n",
+        "            if s.student_id == student_id:\n",
+        "                s.name = updated_data.get('name', s.name)\n",
+        "                s.age = updated_data.get('age', s.age)\n",
+        "                s.grade = updated_data.get('grade', s.grade)\n",
+        "                s.gpa = updated_data.get('gpa', s.gpa)\n",
+        "                self._save_data()\n",
+        "                return True\n",
+        "        return False\n"
+      ],
+      "metadata": {
+        "id": "5NVC20T_Fbzq"
+      },
+      "execution_count": 58,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import streamlit as st\n",
+        "import pandas as pd\n",
+        "from models.student import Student\n",
+        "\n",
+        "def render_ui(manager):\n",
+        "    st.set_page_config(page_title=\"Student Manager 2026\", layout=\"wide\")\n",
+        "    st.title(\"🎓 Student Management System\")\n",
+        "\n",
+        "    menu = [\"View Database\", \"Add Student\", \"Edit/Remove Records\"]\n",
+        "    choice = st.sidebar.selectbox(\"Navigate\", menu)\n",
+        "\n",
+        "    if choice == \"Add Student\":\n",
+        "        st.subheader(\"📝 Register New Student\")\n",
+        "        with st.form(\"student_form\"):\n",
+        "            s_id = st.text_input(\"Student ID\")\n",
+        "            name = st.text_input(\"Full Name\")\n",
+        "            age = st.number_input(\"Age\", 5, 100, 18)\n",
+        "            grade = st.selectbox(\"Grade\", [\"9th\", \"10th\", \"11th\", \"12th\", \"College\"])\n",
+        "            gpa = st.slider(\"GPA\", 0.0, 4.0, 3.0)\n",
+        "\n",
+        "            if st.form_submit_button(\"Submit\"):\n",
+        "                if s_id and name:\n",
+        "                    success, msg = manager.add_student(Student(s_id, name, age, grade, gpa))\n",
+        "                    if success: st.success(msg)\n",
+        "                    else: st.error(msg)\n",
+        "                else: st.warning(\"ID and Name are required.\")\n",
+        "\n",
+        "    elif choice == \"View Database\":\n",
+        "        st.subheader(\"📊 Student Records\")\n",
+        "        data = [s.to_dict() for s in manager.students]\n",
+        "        if data:\n",
+        "            df = pd.DataFrame(data)\n",
+        "            search = st.text_input(\"🔍 Search by Name\")\n",
+        "            if search:\n",
+        "                df = df[df['name'].str.contains(search, case=False)]\n",
+        "            st.dataframe(df, use_container_width=True)\n",
+        "        else:\n",
+        "            st.info(\"No records found.\")\n"
+      ],
+      "metadata": {
+        "id": "BZO05PKSFbuc"
+      },
+      "execution_count": 59,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "from services.manager import StudentManager\n",
+        "from ui.dashboard import render_ui\n",
+        "\n",
+        "# Ensure data directory exists\n",
+        "if not os.path.exists('data'):\n",
+        "    os.makedirs('data')\n",
+        "\n",
+        "manager = StudentManager()\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    render_ui(manager)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 384
+        },
+        "id": "cK7qTeKbFjdv",
+        "outputId": "e29d641d-119d-4032-f263-1ea9443e9057"
+      },
+      "execution_count": 60,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ModuleNotFoundError",
+          "evalue": "No module named 'services.manager'",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-905066047.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mos\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0mservices\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmanager\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mStudentManager\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      3\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mui\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdashboard\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mrender_ui\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;31m# Ensure data directory exists\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'services.manager'",
+            "",
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0;32m\nNOTE: If your import is failing due to a missing package, you can\nmanually install dependencies using either !pip or !apt.\n\nTo view examples of installing some common dependencies, click the\n\"Open Examples\" button below.\n\u001b[0;31m---------------------------------------------------------------------------\u001b[0m\n"
+          ],
+          "errorDetails": {
+            "actions": [
+              {
+                "action": "open_url",
+                "actionText": "Open Examples",
+                "url": "/notebooks/snippets/importing_libraries.ipynb"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install streamlit -q\n",
+        "!npm install -g localtunnel\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Dv8t-6yTFjaS",
+        "outputId": "020d6a82-3202-4208-f0ce-81f747941ef6"
+      },
+      "execution_count": 61,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0K⠹\u001b[1G\u001b[0K⠸\u001b[1G\u001b[0K⠼\u001b[1G\u001b[0K⠴\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K⠧\u001b[1G\u001b[0K⠇\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K⠋\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0K⠹\u001b[1G\u001b[0K⠸\u001b[1G\u001b[0K⠼\u001b[1G\u001b[0K⠴\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K⠧\u001b[1G\u001b[0K⠇\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K\n",
+            "added 22 packages in 2s\n",
+            "\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K\n",
+            "\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K3 packages are looking for funding\n",
+            "\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K  run `npm fund` for details\n",
+            "\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K\u001b[1mnpm\u001b[22m \u001b[96mnotice\u001b[39m\n",
+            "\u001b[1mnpm\u001b[22m \u001b[96mnotice\u001b[39m New \u001b[31mmajor\u001b[39m version of npm available! \u001b[31m10.8.2\u001b[39m -> \u001b[34m11.7.0\u001b[39m\n",
+            "\u001b[1mnpm\u001b[22m \u001b[96mnotice\u001b[39m Changelog: \u001b[34mhttps://github.com/npm/cli/releases/tag/v11.7.0\u001b[39m\n",
+            "\u001b[1mnpm\u001b[22m \u001b[96mnotice\u001b[39m To update run: \u001b[4mnpm install -g npm@11.7.0\u001b[24m\n",
+            "\u001b[1mnpm\u001b[22m \u001b[96mnotice\u001b[39m\n",
+            "\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile main.py\n",
+        "import streamlit as st\n",
+        "# (Paste the rest of your main.py code here)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ib3dDnhbFbn-",
+        "outputId": "6d6fdef9-fe98-42ae-8a39-0ee6cf523d6e"
+      },
+      "execution_count": 62,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing main.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!streamlit run main.py &>/content/logs.txt &\n"
+      ],
+      "metadata": {
+        "id": "BSJfHb4THJgo"
+      },
+      "execution_count": 63,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Get your IP (you will need to paste this into the tunnel page)\n",
+        "import urllib\n",
+        "print(\"Password/Endpoint IP:\", urllib.request.urlopen('https://ipv4.icanhazip.com').read().decode('utf8').strip())\n",
+        "\n",
+        "# Start the tunnel\n",
+        "!npx localtunnel --port 8501\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UAbhCFwsHJdC",
+        "outputId": "a49b0576-4521-4bfb-b010-6a1b309ab3c6"
+      },
+      "execution_count": 64,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Password/Endpoint IP: 34.143.197.51\n",
+            "\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0K⠹\u001b[1G\u001b[0K⠸\u001b[1G\u001b[0K⠼\u001b[1G\u001b[0K⠴\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K⠧\u001b[1G\u001b[0K⠇\u001b[1G\u001b[0K⠏\u001b[1G\u001b[0K⠋\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0K⠹\u001b[1G\u001b[0K⠸\u001b[1G\u001b[0K⠼\u001b[1G\u001b[0K⠴\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K⠧\u001b[1G\u001b[0K⠇\u001b[1G\u001b[0Kyour url is: https://beige-ways-shop.loca.lt\n",
+            "^C\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "HN3BfzB1HJaH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "UTj6iJPVHJW-"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
